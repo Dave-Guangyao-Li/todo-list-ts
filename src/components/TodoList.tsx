@@ -10,13 +10,19 @@ interface Todo {
 interface TodoListProps {
 	todos: Todo[];
 	onChange: (id: string, checked: boolean) => void;
+	onDelete: (id: string) => void;
 }
 
-const TodoList: React.FC<TodoListProps> = ({ todos, onChange }) => {
+const TodoList: React.FC<TodoListProps> = ({ todos, onChange, onDelete }) => {
 	return (
 		<div>
 			{todos.map((todo) => (
-				<TodoItem key={todo.id} {...todo} onChange={onChange} />
+				<TodoItem
+					key={todo.id}
+					{...todo}
+					onChange={onChange}
+					onDelete={onDelete}
+				/>
 			))}
 		</div>
 	);
