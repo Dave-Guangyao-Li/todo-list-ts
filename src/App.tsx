@@ -55,9 +55,11 @@ const App: React.FC = () => {
 		setTodos(updateTodos);
 	};
 
-	const handleChange = (id: string, checked: boolean) => {
+	const handleChange = (id: string, checked: boolean, label?: string) => {
 		const updatedTodos = todos
-			.map((todo: Todo) => (todo.id === id ? { ...todo, checked } : todo))
+			.map((todo: Todo) =>
+				todo.id === id ? { ...todo, checked, label: label || todo.label } : todo
+			)
 			.sort((a: Todo, b: Todo) => {
 				if (!a.checked && b.checked) {
 					return -1; // `a` is unchecked, comes before `b`

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useState } from 'react';
 
 const TodoWrapper = styled.div`
 	display: flex;
@@ -19,7 +20,7 @@ interface TodoItemProps {
 	id: string;
 	label: string;
 	checked: boolean;
-	onChange: (id: string, checked: boolean) => void; // Ensure this is included
+	onChange: (id: string, checked: boolean, label?: string) => void; // Ensure this is included
 	onDelete: (id: string) => void;
 }
 
@@ -30,24 +31,39 @@ const TodoItem: React.FC<TodoItemProps> = ({
 	onChange,
 	onDelete,
 }) => {
+	const [isEditing, setIsEditing] = useState(false);
+	const [editLabel, setEditLabel] = useState(label);
+
+	const handleSave = () => {
+		if (editLabel.trim()) {
+			onChange(id, checked, editLabel);
+			setIsEditing(false);
+		}
+	};
 	return (
 		<TodoWrapper>
-			<Label checked={checked}>{label}</Label>
-			<div
-				className='checkbox-and-delete'
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-				}}
-			>
+			<input
+				type='checkbox'
+				checked={checked}
+				onChange={(e) => onChange(id, e.target.checked)} // Pass updated checked state.// The checked value passed to onChange comes directly from the DOM event (e.target.checked), which ensures that the UI and the application state remain in sync.
+			/>
+			{isEditing ? (
 				<input
-					type='checkbox'
-					checked={checked}
-					onChange={(e) => onChange(id, e.target.checked)} // The checked value passed to onChange comes directly from the DOM event (e.target.checked), which ensures that the UI and the application state remain in sync.
+					type='text'
+					value={editLabel}
+					onChange={(e) => setEditLabel(e.target.value)}
+					onBlur={handleSave} // Save on blur
+					onKeyDown={(e) => e.key === 'Enter' && handleSave()} // Save on Enter
 				/>
-				<button onClick={() => onDelete(id)}>X</button>
-			</div>
+			) : (
+				<span
+					onDoubleClick={() => setIsEditing(true)}
+					style={{ textDecoration: checked ? 'line-through' : 'none' }}
+				>
+					{label}
+				</span> // Enable editing on double-click
+			)}
+			<button onClick={() => onDelete(id)}>X</button>
 		</TodoWrapper>
 	);
 };
