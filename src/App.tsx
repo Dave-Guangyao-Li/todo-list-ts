@@ -41,7 +41,15 @@ const App: React.FC = () => {
 	const handleChange = (id: string, checked: boolean) => {
 		const updatedTodos = todos
 			.map((todo: Todo) => (todo.id === id ? { ...todo, checked } : todo))
-			.sort((a: Todo, b: Todo) => Number(a.checked) - Number(b.checked)); //This sorting function ensures that unchecked todos (checked: false) appear before checked todos (checked: true)
+			.sort((a: Todo, b: Todo) => {
+				if (!a.checked && b.checked) {
+					return -1; // `a` is unchecked, comes before `b`
+				}
+				if (a.checked && !b.checked) {
+					return 1; // `a` is checked, comes after `b`
+				}
+				return 0; // Both are either checked or unchecked, order remains unchanged
+			}); // Both are either checked or unchecked, order remains unchanged}); //This sorting function ensures that unchecked todos (checked: false) appear before checked todos (checked: true)
 		// The comparison function must return:
 		// •	Negative value: If a should come before b.
 		// •	Zero: If a and b are considered equal (order remains unchanged).
