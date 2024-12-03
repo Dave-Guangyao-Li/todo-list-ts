@@ -25,19 +25,29 @@ const App: React.FC = () => {
 		{ id: '2', label: 'Reboot computer', checked: false },
 		{ id: '3', label: 'Ace interview', checked: true },
 	];
-	const [todos, setTodos] = useState(initialTodos);
+	const [todos, setTodos] = useState(() => {
+		const savedTodos = localStorage.getItem('todos');
+		return savedTodos ? JSON.parse(savedTodos) : initialTodos;
+	});
 
 	// Add new todo
 	const addTodo = useCallback((label: string) => {
-		setTodos((prev) => [{ id: uuid(), label, checked: false }, ...prev]);
+		setTodos((prev: Todo[]) => [
+			{ id: uuid(), label, checked: false },
+			...prev,
+		]);
 	}, []);
 
 	const handleChange = (id: string, checked: boolean) => {
-		const updatedTodos = todos.map((todo) =>
+		const updatedTodos = todos.map((todo: Todo) =>
 			todo.id === id ? { ...todo, checked } : todo
 		);
 		setTodos(updatedTodos);
 	};
+
+	useEffect(() => {
+		localStorage.setItem('todos', JSON.stringify(todos));
+	}, [todos]);
 
 	return (
 		<Wrapper>
