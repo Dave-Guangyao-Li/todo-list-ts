@@ -56,6 +56,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
 				type='checkbox'
 				checked={checked}
 				onChange={(e) => onChange(id, e.target.checked)} // Pass updated checked state.// The checked value passed to onChange comes directly from the DOM event (e.target.checked), which ensures that the UI and the application state remain in sync.
+				aria-label={`Mark ${label} as ${checked ? 'incomplete' : 'complete'}`}
 			/>
 			{isEditing ? (
 				<input
@@ -73,7 +74,9 @@ const TodoItem: React.FC<TodoItemProps> = ({
 					{label}
 				</span> // Enable editing on double-click
 			)}
-			<button onClick={handleDelete}>X</button>
+			<button onClick={handleDelete} aria-label={`Delete ${label}`}>
+				X
+			</button>
 		</TodoWrapper>
 	);
 };
