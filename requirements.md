@@ -94,3 +94,11 @@ Component Structure
 
    • Provides an input field and a button to add new todos.
    • Calls the onAdd function passed from App.tsx.
+
+Key Interview Expectations
+
+    1.	Correctness: Does the app meet all functional requirements?
+    2.	Clean Code: Are components modular and reusable? Is the code readable and maintainable?
+    3.	TypeScript Usage: Are types defined and used effectively?
+    4.	State Management: Is state updated immutably and efficiently?
+    5.	UI/UX: Is the app visually organized and user-friendly?

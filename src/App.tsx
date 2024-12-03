@@ -32,11 +32,19 @@ const App: React.FC = () => {
 		setTodos((prev) => [{ id: uuid(), label, checked: false }, ...prev]);
 	}, []);
 
+	const handleChange = (id: string, checked: boolean) => {
+		const updatedTodos = todos.map((todo) =>
+			todo.id === id ? { ...todo, checked } : todo
+		);
+		setTodos(updatedTodos);
+	};
+
 	return (
 		<Wrapper>
 			<h1>Todo List</h1>
 			<AddInput onAdd={addTodo} />
-			<TodoList todos={todos} />
+			{/*  the checked value is explicitly passed from the TodoItem component via the onChange handler. This approach ensures that the checked state of the todo is set to the exact value provided by the input event (e.target.checked), which comes directly from the browser’s checkbox state. */}
+			<TodoList todos={todos} onChange={handleChange} />
 		</Wrapper>
 	);
 };
