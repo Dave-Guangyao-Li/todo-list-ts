@@ -71,6 +71,24 @@ Requirements
    • Completed (checked)
    • Allow inline editing of the label for each todo item.
 
+Bonus Features:
+
+    1.	Add Animations:
+       •	Animate toggling, reordering, and deleting todos.
+         Solution:Use React Transition Group for animations.
+         npm install react-transition-group
+    2.	Filtering System:
+      •	Add filters to display:
+         •	All todos
+         •	Active todos (unchecked)
+         •	Completed todos (checked)
+    3.	Inline Editing:
+       •	Allow users to edit the label of a todo directly.
+    4.	Accessibility:
+       •	Add ARIA labels for checkboxes and buttons.
+    5.	Confirmation Prompt Before Deleting:
+       •	Display a confirmation prompt before permanently deleting a todo.
+
 Component Structure
 
 1. App.tsx
