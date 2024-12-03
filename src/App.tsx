@@ -5,6 +5,58 @@ import AddInput from './components/AddInput';
 
 import TodoList from './components/TodoList';
 
+const AppWrapper = styled.div`
+	display: flex;
+	width: 400px;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+`;
+
+const Card = styled.div`
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	max-width: 600px;
+	width: 100%;
+	padding: 20px;
+	box-sizing: border-box;
+`;
+
+const Title = styled.h1`
+	font-size: 1.8rem;
+	color: #333;
+	margin-bottom: 20px;
+	text-align: center;
+`;
+
+const FilterWrapper = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+`;
+
+const Dropdown = styled.select`
+	padding: 10px;
+	border-radius: 8px;
+	border: 1px solid #ccc;
+	font-size: 1rem;
+	background: #fff;
+	cursor: pointer;
+	transition: border-color 0.3s;
+
+	&:hover {
+		border-color: #007bff;
+	}
+
+	&:focus {
+		outline: none;
+		border-color: #007bff;
+	}
+`;
+
 const Wrapper = styled.div`
 	width: 400px;
 	background: #fff;
@@ -85,24 +137,27 @@ const App: React.FC = () => {
 	}, [todos]);
 
 	return (
-		<Wrapper>
-			<h1>Todo List</h1>
-			<select
-				value={filter}
-				onChange={(e) => setFilter(e.target.value as typeof filter)}
-			>
-				<option value='all'>All</option>
-				<option value='active'>Active</option>
-				<option value='completed'>Completed</option>
-			</select>
-			<AddInput onAdd={addTodo} />
-			{/*  the checked value is explicitly passed from the TodoItem component via the onChange handler. This approach ensures that the checked state of the todo is set to the exact value provided by the input event (e.target.checked), which comes directly from the browser’s checkbox state. */}
-			<TodoList
-				todos={filteredTodos}
-				onChange={handleChange}
-				onDelete={handleDelete}
-			/>
-		</Wrapper>
+		<AppWrapper>
+			<Card>
+				<Title>Modern Todo List</Title>
+				<FilterWrapper>
+					<Dropdown
+						value={filter}
+						onChange={(e) => setFilter(e.target.value as typeof filter)}
+					>
+						<option value='all'>All</option>
+						<option value='active'>Active</option>
+						<option value='completed'>Completed</option>
+					</Dropdown>
+				</FilterWrapper>
+				<AddInput onAdd={addTodo} />
+				<TodoList
+					todos={filteredTodos}
+					onChange={handleChange}
+					onDelete={handleDelete}
+				/>
+			</Card>
+		</AppWrapper>
 	);
 };
 
