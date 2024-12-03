@@ -30,6 +30,18 @@ const App: React.FC = () => {
 		return savedTodos ? JSON.parse(savedTodos) : initialTodos;
 	});
 
+	const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+
+	const filteredTodos = todos.filter((todo: Todo) => {
+		if (filter === 'active') {
+			return !todo.checked;
+		}
+		if (filter === 'completed') {
+			return todo.checked;
+		}
+		return true;
+	});
+
 	// Add new todo
 	const addTodo = useCallback((label: string) => {
 		setTodos((prev: Todo[]) => [
@@ -73,9 +85,21 @@ const App: React.FC = () => {
 	return (
 		<Wrapper>
 			<h1>Todo List</h1>
+			<select
+				value={filter}
+				onChange={(e) => setFilter(e.target.value as typeof filter)}
+			>
+				<option value='all'>All</option>
+				<option value='active'>Active</option>
+				<option value='completed'>Completed</option>
+			</select>
 			<AddInput onAdd={addTodo} />
 			{/*  the checked value is explicitly passed from the TodoItem component via the onChange handler. This approach ensures that the checked state of the todo is set to the exact value provided by the input event (e.target.checked), which comes directly from the browser’s checkbox state. */}
-			<TodoList todos={todos} onChange={handleChange} onDelete={handleDelete} />
+			<TodoList
+				todos={filteredTodos}
+				onChange={handleChange}
+				onDelete={handleDelete}
+			/>
 		</Wrapper>
 	);
 };
