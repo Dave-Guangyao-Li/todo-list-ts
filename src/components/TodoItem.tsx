@@ -12,9 +12,9 @@ const TodoWrapper = styled.div`
 	margin-bottom: 8px;
 `;
 
-const Label = styled.label<{ checked: boolean }>`
-	text-decoration: ${({ checked }) => (checked ? 'line-through' : 'none')};
-`;
+// const Label = styled.label<{ checked: boolean }>`
+// 	text-decoration: ${({ checked }) => (checked ? 'line-through' : 'none')};
+// `;
 
 interface TodoItemProps {
 	id: string;
@@ -40,6 +40,16 @@ const TodoItem: React.FC<TodoItemProps> = ({
 			setIsEditing(false);
 		}
 	};
+
+	const handleDelete = () => {
+		const userConfirmed = window.confirm(
+			`Are you sure you want to delete "${label}"?`
+		);
+		if (userConfirmed) {
+			onDelete(id);
+		}
+	};
+
 	return (
 		<TodoWrapper>
 			<input
@@ -63,7 +73,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
 					{label}
 				</span> // Enable editing on double-click
 			)}
-			<button onClick={() => onDelete(id)}>X</button>
+			<button onClick={handleDelete}>X</button>
 		</TodoWrapper>
 	);
 };
