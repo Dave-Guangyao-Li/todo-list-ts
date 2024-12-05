@@ -7,7 +7,7 @@ import TodoList from './components/TodoList';
 
 const AppWrapper = styled.div`
 	display: flex;
-	width: 400px;
+	width: 1000px;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
@@ -65,21 +65,49 @@ const Wrapper = styled.div`
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
-interface Todo {
+export interface Todo {
 	id: string;
 	label: string;
 	checked: boolean;
+	deadline?: Date | null;
 }
 
 const App: React.FC = () => {
 	const initialTodos = [
-		{ id: '1', label: 'Buy groceries', checked: false },
-		{ id: '2', label: 'Reboot computer', checked: false },
-		{ id: '3', label: 'Ace interview', checked: true },
+		{
+			id: '1',
+			label: 'Buy groceries',
+			checked: false,
+			deadline: '2024-12-01T23:59:00',
+		},
+		{
+			id: '2',
+			label: 'Reboot computer',
+			checked: false,
+			deadline: '2024-12-10T23:59:00',
+		},
+		{
+			id: '3',
+			label: 'Ace interview',
+			checked: true,
+			deadline: '2024-12-05T23:59:00',
+		},
 	];
 	const [todos, setTodos] = useState(() => {
 		const savedTodos = localStorage.getItem('todos');
-		return savedTodos ? JSON.parse(savedTodos) : initialTodos;
+		if (savedTodos) {
+			const parsedTodos = JSON.parse(savedTodos);
+			// Add a deadline field to each item if it doesn't exist
+			const updatedTodos = parsedTodos.map((todo: Todo) => {
+				if (!todo.deadline) {
+					todo.deadline = null; // or some default value
+				}
+				return todo;
+			});
+			return updatedTodos;
+		} else {
+			return initialTodos;
+		}
 	});
 
 	const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
@@ -95,9 +123,9 @@ const App: React.FC = () => {
 	});
 
 	// Add new todo
-	const addTodo = useCallback((label: string) => {
+	const addTodo = useCallback((label: string, deadline?: Date | null) => {
 		setTodos((prev: Todo[]) => [
-			{ id: uuid(), label, checked: false },
+			{ id: uuid(), label, checked: false, deadline },
 			...prev,
 		]);
 	}, []);
@@ -107,10 +135,22 @@ const App: React.FC = () => {
 		setTodos(updateTodos);
 	};
 
-	const handleChange = (id: string, checked: boolean, label?: string) => {
+	const handleChange = (
+		id: string,
+		checked: boolean,
+		label?: string,
+		deadline?: Date | null
+	) => {
 		const updatedTodos = todos
 			.map((todo: Todo) =>
-				todo.id === id ? { ...todo, checked, label: label || todo.label } : todo
+				todo.id === id
+					? {
+							...todo,
+							checked,
+							label: label || todo.label,
+							deadline: deadline || todo.deadline,
+					  }
+					: todo
 			)
 			.sort((a: Todo, b: Todo) => {
 				if (!a.checked && b.checked) {
@@ -135,6 +175,16 @@ const App: React.FC = () => {
 	useEffect(() => {
 		localStorage.setItem('todos', JSON.stringify(todos));
 	}, [todos]);
+
+	// useEffect(() => {
+	// 	const overdueTasks = todos.filter(
+	// 		(todo: Todo) => todo.deadline && new Date() > new Date(todo.deadline)
+	// 	);
+
+	// 	if (overdueTasks.length > 0) {
+	// 		alert(`You have ${overdueTasks.length} overdue tasks!`);
+	// 	}
+	// }, [todos]);
 
 	return (
 		<AppWrapper>

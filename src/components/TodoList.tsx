@@ -3,15 +3,22 @@ import TodoItem from './TodoItem';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable } from './StrictModeDroppable';
 import { motion, AnimatePresence } from 'framer-motion';
-interface Todo {
-	id: string;
-	label: string;
-	checked: boolean;
-}
+import { Todo } from '../App';
+// interface Todo {
+// 	id: string;
+// 	label: string;
+// 	checked: boolean;
+// 	deadline?: Date; // Optional deadline
+// }
 
 interface TodoListProps {
 	todos: Todo[];
-	onChange: (id: string, checked: boolean) => void;
+	onChange: (
+		id: string,
+		checked: boolean,
+		label?: string,
+		deadline?: Date | null
+	) => void;
 	onDelete: (id: string) => void;
 	setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 }
@@ -57,6 +64,7 @@ const TodoList: React.FC<TodoListProps> = ({
 														{...todo}
 														onChange={onChange}
 														onDelete={onDelete}
+														deadline={todo.deadline}
 													/>
 												</motion.div>
 											</div>
