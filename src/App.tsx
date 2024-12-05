@@ -155,6 +155,7 @@ const App: React.FC = () => {
 					todos={filteredTodos}
 					onChange={handleChange}
 					onDelete={handleDelete}
+					setTodos={setTodos}
 				/>
 			</Card>
 		</AppWrapper>

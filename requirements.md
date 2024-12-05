@@ -1,6 +1,6 @@
 1. Initialize a React + TypeScript Project
 
-```
+```shell
 npx create-react-app todo-list-ts --template typescript
 cd todo-list-ts
 npm start
@@ -8,7 +8,7 @@ npm start
 
 2. Install Required Packages
 
-```
+```shell
 npm install uuid styled-components
 npm install @types/react @types/styled-components
 ```
@@ -26,7 +26,7 @@ src/
 
 This project involves building a functional Todo List application using React and TypeScript. The tasks are designed to test your knowledge of React fundamentals, state management, TypeScript, and component-based design principles. Below are the requirements, detailed solutions, and boilerplate code for each step.
 
-Requirements
+## Requirements
 
 1. Initialize the App
 
@@ -71,7 +71,7 @@ Requirements
    • Completed (checked)
    • Allow inline editing of the label for each todo item.
 
-Bonus Features:
+## Bonus Features:
 
     1.	Add Animations:
        •	Animate toggling, reordering, and deleting todos.
@@ -89,7 +89,22 @@ Bonus Features:
     5.	Confirmation Prompt Before Deleting:
        •	Display a confirmation prompt before permanently deleting a todo.
 
-Component Structure
+## Advanced Requirements
+
+1. Prioritize Tasks (Drag-and-Drop)
+   Allow users to reorder tasks using a drag-and-drop interface.
+2. Task Deadline with Notifications
+   Allow users to set a deadline for tasks and notify them when a task is overdue.
+3. Add Task Tags
+   Allow users to categorize tasks with tags (e.g., “Work”, “Personal”).
+4. Dark Mode
+   Add a dark mode toggle to the app.
+5. Progressive Web App (PWA)
+   Turn the app into a PWA so users can install it on their devices.
+6. Offline Mode
+   Cache todos locally and allow updates offline, syncing changes when the app goes online.
+
+## Component Structure
 
 1. App.tsx
 
@@ -113,7 +128,7 @@ Component Structure
    • Provides an input field and a button to add new todos.
    • Calls the onAdd function passed from App.tsx.
 
-Key Interview Expectations
+## Key Interview Expectations
 
     1.	Correctness: Does the app meet all functional requirements?
     2.	Clean Code: Are components modular and reusable? Is the code readable and maintainable?
