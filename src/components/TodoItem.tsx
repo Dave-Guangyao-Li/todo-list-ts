@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const TodoWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	align-items: flex-start;
 	padding: 8px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
@@ -96,6 +96,10 @@ const TodoItem: React.FC<TodoItemProps> = ({
 			/>
 			{isEditing ? (
 				<input
+					style={{
+						whiteSpace: 'nowrap',
+						width: '100px',
+					}}
 					type='text'
 					value={editLabel}
 					onChange={(e) => setEditLabel(e.target.value)}
@@ -105,7 +109,13 @@ const TodoItem: React.FC<TodoItemProps> = ({
 			) : (
 				<span
 					// onDoubleClick={() => setIsEditing(true)}
-					style={{ textDecoration: checked ? 'line-through' : 'none' }}
+					style={{
+						textDecoration: checked ? 'line-through' : 'none',
+						whiteSpace: 'nowrap',
+						width: '100px',
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+					}}
 				>
 					{label}
 				</span> // Enable editing on double-click
@@ -123,21 +133,41 @@ const TodoItem: React.FC<TodoItemProps> = ({
 					placeholderText='Deadline'
 					onBlur={handleSave} // Save on blur
 				/>
+			) : deadline ? (
+				<span
+					style={{
+						color: isOverdue ? 'red' : 'green',
+						width: '200px',
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+					}}
+				>
+					{isOverdue
+						? `Overdue:  ${new Date(deadline).toLocaleDateString()}`
+						: `Due: ${new Date(deadline).toLocaleDateString()}`}
+				</span>
 			) : (
-				deadline && (
-					<span style={{ color: isOverdue ? 'red' : 'green' }}>
-						{isOverdue
-							? 'Overdue'
-							: `Due: ${new Date(deadline).toLocaleDateString()}`}
-					</span>
-				)
+				<span
+					style={{
+						color: 'Blue',
+						width: '200px',
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+					}}
+				>
+					No deadline
+				</span>
 			)}
 
-			<TodoItemUpdateButton onClick={handleEdit}>Edit</TodoItemUpdateButton>
-			<TodoItemDeleteButton onClick={handleDelete}>Delete</TodoItemDeleteButton>
-			{/* <button onClick={handleDelete} aria-label={`Delete ${label}`}>
-				X
-			</button> */}
+			<div
+				className='todo-item-buttons'
+				style={{ display: 'flex', flexDirection: 'row' }}
+			>
+				<TodoItemUpdateButton onClick={handleEdit}>Edit</TodoItemUpdateButton>
+				<TodoItemDeleteButton onClick={handleDelete}>
+					Delete
+				</TodoItemDeleteButton>
+			</div>
 		</TodoWrapper>
 	);
 };

@@ -5,6 +5,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 const InputWrapper = styled.div`
 	display: flex;
 	margin-bottom: 16px;
+	width: 100%;
+	justify-content: space-between;
+	align-items: center;
 `;
 
 const Input = styled.input`
@@ -24,16 +27,7 @@ const Button = styled.button`
 `;
 
 const DatePickerWrapper = styled.div`
-	margin-bottom: 6px;
-`;
-
-const DeleteButton = styled.button`
-	padding: 8px 12px;
 	margin-left: 8px;
-	background: #dc3545;
-	color: #fff;
-	border: none;
-	cursor: pointer;
 `;
 
 interface AddInputProps {
