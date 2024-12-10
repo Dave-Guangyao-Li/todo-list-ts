@@ -3,15 +3,17 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useTheme } from '../context/ThemeContext';
 
-const TodoWrapper = styled.div`
+const TodoWrapper = styled.div<{ isDarkMode: boolean }>`
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
 	padding: 8px;
-	border: 1px solid #ccc;
+	border: 1px solid ${({ isDarkMode }) => isDarkMode ? '#444' : '#ccc'};
 	border-radius: 4px;
 	margin-bottom: 8px;
+	background: ${({ isDarkMode }) => isDarkMode ? '#2d2d2d' : '#fff'};
 `;
 
 const TodoItemUpdateButton = styled.button`
@@ -39,9 +41,33 @@ const TodoItemDeleteButton = styled.button`
 		outline-offset: 2px;
 	}
 `;
-// const Label = styled.label<{ checked: boolean }>`
-// 	text-decoration: ${({ checked }) => (checked ? 'line-through' : 'none')};
-// `;
+
+const TagsContainer = styled.div`
+	display: flex;
+	gap: 4px;
+	margin-left: 8px;
+	flex-wrap: wrap;
+`;
+
+const Tag = styled.span<{ isDarkMode: boolean }>`
+	background: ${({ isDarkMode }) => isDarkMode ? '#444' : '#e0e0e0'};
+	color: ${({ isDarkMode }) => isDarkMode ? '#fff' : '#333'};
+	padding: 2px 6px;
+	border-radius: 12px;
+	font-size: 12px;
+	display: inline-flex;
+	align-items: center;
+`;
+
+const TagInput = styled.input<{ isDarkMode: boolean }>`
+	background: ${({ isDarkMode }) => isDarkMode ? '#444' : '#fff'};
+	color: ${({ isDarkMode }) => isDarkMode ? '#fff' : '#333'};
+	border: 1px solid ${({ isDarkMode }) => isDarkMode ? '#666' : '#ccc'};
+	padding: 4px;
+	border-radius: 4px;
+	margin-right: 8px;
+	width: 80px;
+`;
 
 interface TodoItemProps {
 	id: string;
@@ -51,10 +77,12 @@ interface TodoItemProps {
 		id: string,
 		checked: boolean,
 		label?: string,
-		deadline?: Date | null
-	) => void; // Ensure this is included
+		deadline?: Date | null,
+		tags?: string[]
+	) => void;
 	onDelete: (id: string) => void;
 	deadline?: Date | null;
+	tags: string[];
 }
 
 const TodoItem: React.FC<TodoItemProps> = ({
@@ -64,20 +92,38 @@ const TodoItem: React.FC<TodoItemProps> = ({
 	onChange,
 	onDelete,
 	deadline,
+	tags,
 }) => {
+	const { isDarkMode } = useTheme();
 	const [isEditing, setIsEditing] = useState(false);
 	const [isEditingDeadline, setIsEditingDeadline] = useState(false);
 	const [newDeadline, setNewDeadline] = useState(deadline);
 	const [editLabel, setEditLabel] = useState(label);
+	const [editTags, setEditTags] = useState(tags);
+	const [newTag, setNewTag] = useState('');
 
 	const isOverdue = deadline && new Date() > new Date(deadline);
 
 	const handleSave = () => {
 		if (editLabel.trim()) {
-			onChange(id, checked, editLabel, newDeadline);
+			onChange(id, checked, editLabel, newDeadline, editTags);
 			setIsEditing(false);
 			setIsEditingDeadline(false);
 		}
+	};
+
+	const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter' && newTag.trim()) {
+			setEditTags([...editTags, newTag.trim()]);
+			setNewTag('');
+			onChange(id, checked, editLabel, newDeadline, [...editTags, newTag.trim()]);
+		}
+	};
+
+	const handleRemoveTag = (tagToRemove: string) => {
+		const updatedTags = editTags.filter(tag => tag !== tagToRemove);
+		setEditTags(updatedTags);
+		onChange(id, checked, editLabel, newDeadline, updatedTags);
 	};
 
 	const handleEdit = () => {
@@ -95,11 +141,11 @@ const TodoItem: React.FC<TodoItemProps> = ({
 	};
 
 	return (
-		<TodoWrapper>
+		<TodoWrapper isDarkMode={isDarkMode}>
 			<input
 				type='checkbox'
 				checked={checked}
-				onChange={(e) => onChange(id, e.target.checked)} // Pass updated checked state.// The checked value passed to onChange comes directly from the DOM event (e.target.checked), which ensures that the UI and the application state remain in sync.
+				onChange={(e) => onChange(id, e.target.checked)}
 				aria-label={`Mark ${label} as ${checked ? 'incomplete' : 'complete'}`}
 				role="checkbox"
 				aria-checked={checked}
@@ -113,38 +159,31 @@ const TodoItem: React.FC<TodoItemProps> = ({
 					type='text'
 					value={editLabel}
 					onChange={(e) => setEditLabel(e.target.value)}
-					onBlur={handleSave} // Save on blur
-					onKeyDown={(e) => e.key === 'Enter' && handleSave()} // Save on Enter
+					onBlur={handleSave}
+					onKeyDown={(e) => e.key === 'Enter' && handleSave()}
 					aria-label="Edit todo text"
 				/>
 			) : (
 				<span
-					// onDoubleClick={() => setIsEditing(true)}
 					style={{
 						textDecoration: checked ? 'line-through' : 'none',
 						whiteSpace: 'nowrap',
 						width: '100px',
 						overflow: 'hidden',
 						textOverflow: 'ellipsis',
-						}}
-						aria-label={`Edit ${label} text`}
+					}}
+					aria-label={`Edit ${label} text`}
 				>
 					{label}
-				</span> // Enable editing on double-click
+				</span>
 			)}
 			{isEditingDeadline ? (
-				// <input
-				// 	type='date'
-				// 	value={newDeadline?.toISOString() ?? ''}
-				// 	onChange={handleChange}
-				// 	onBlur={handleSave}
-				// />
 				<DatePicker
 					selected={newDeadline}
 					onChange={(date) => setNewDeadline(date)}
 					placeholderText='Deadline'
-					onBlur={handleSave} // Save on blur
-					onKeyDown={(e) => e.key === 'Enter' && handleSave()} // Save on Enter
+					onBlur={handleSave}
+					onKeyDown={(e) => e.key === 'Enter' && handleSave()}
 				/>
 			) : deadline ? (
 				<span
@@ -172,7 +211,45 @@ const TodoItem: React.FC<TodoItemProps> = ({
 					No deadline
 				</span>
 			)}
-
+			{isEditing ? (
+				<>
+					<TagInput
+						type="text"
+						value={newTag}
+						onChange={(e) => setNewTag(e.target.value)}
+						onKeyDown={handleAddTag}
+						placeholder="Add tag"
+						aria-label="Add new tag"
+						isDarkMode={isDarkMode}
+					/>
+					<TagsContainer>
+						{editTags.map((tag) => (
+							<Tag 
+								key={tag} 
+								isDarkMode={isDarkMode}
+								onClick={() => handleRemoveTag(tag)}
+								role="button"
+								aria-label={`Remove ${tag} tag`}
+							>
+								{tag} ×
+							</Tag>
+						))}
+					</TagsContainer>
+				</>
+			) : (
+				<TagsContainer>
+					{tags.map((tag) => (
+						<Tag 
+							key={tag} 
+							isDarkMode={isDarkMode}
+							role="status"
+							aria-label={`Task tag: ${tag}`}
+						>
+							{tag}
+						</Tag>
+					))}
+				</TagsContainer>
+			)}
 			<div
 				className='todo-item-buttons'
 				style={{ display: 'flex', flexDirection: 'row' }}

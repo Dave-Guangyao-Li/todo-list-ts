@@ -2,22 +2,24 @@ import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import AddInput from './components/AddInput';
-
 import TodoList from './components/TodoList';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 
-const AppWrapper = styled.div`
+const AppWrapper = styled.div<{ isDarkMode: boolean }>`
 	display: flex;
 	width: 1000px;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	min-height: 100vh;
+	// background: ${({ isDarkMode }) => isDarkMode ? '#1a1a1a' : '#f5f5f5'};
+	color: ${({ isDarkMode }) => isDarkMode ? '#fff' : '#333'};
 `;
 
-const Card = styled.div`
-	background: #fff;
+const Card = styled.div<{ isDarkMode: boolean }>`
+	background: ${({ isDarkMode }) => isDarkMode ? '#2d2d2d' : '#fff'};
 	border-radius: 12px;
-	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	box-shadow: 0px 4px 6px ${({ isDarkMode }) => isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)'};
 	max-width: 800px;
 	width: 100%;
 	padding: 20px;
@@ -26,7 +28,7 @@ const Card = styled.div`
 
 const Title = styled.h1`
 	font-size: 1.8rem;
-	color: #333;
+	// color: #333;
 	margin-bottom: 20px;
 	text-align: center;
 `;
@@ -57,12 +59,25 @@ const Dropdown = styled.select`
 	}
 `;
 
-const Wrapper = styled.div`
-	width: 400px;
-	background: #fff;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+const ThemeToggle = styled.button<{ isDarkMode: boolean }>`
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	padding: 10px;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	background: ${({ isDarkMode }) => isDarkMode ? '#4a4a4a' : '#fff'};
+	border: 1px solid ${({ isDarkMode }) => isDarkMode ? '#666' : '#ccc'};
+	color: ${({ isDarkMode }) => isDarkMode ? '#fff' : '#333'};
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	
+	&:hover {
+		background: ${({ isDarkMode }) => isDarkMode ? '#666' : '#f0f0f0'};
+	}
 `;
 
 export interface Todo {
@@ -70,29 +85,34 @@ export interface Todo {
 	label: string;
 	checked: boolean;
 	deadline?: Date | null;
+	tags: string[];
 }
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
 	const initialTodos = [
 		{
 			id: '1',
 			label: 'Buy groceries',
 			checked: false,
 			deadline: '2024-12-01T23:59:00',
+			tags: ['shopping']
 		},
 		{
 			id: '2',
 			label: 'Reboot computer',
 			checked: false,
 			deadline: '2024-12-10T23:59:00',
+			tags: ['work']
 		},
 		{
 			id: '3',
 			label: 'Ace interview',
 			checked: true,
 			deadline: '2024-12-05T23:59:00',
+			tags: ['personal']
 		},
 	];
+	const { isDarkMode, toggleTheme } = useTheme();
 	const [todos, setTodos] = useState(() => {
 		const savedTodos = localStorage.getItem('todos');
 		if (savedTodos) {
@@ -101,6 +121,9 @@ const App: React.FC = () => {
 			const updatedTodos = parsedTodos.map((todo: Todo) => {
 				if (!todo.deadline) {
 					todo.deadline = null; // or some default value
+				}
+				if (!todo.tags) {
+					todo.tags = []; // or some default value
 				}
 				return todo;
 			});
@@ -123,9 +146,9 @@ const App: React.FC = () => {
 	});
 
 	// Add new todo
-	const addTodo = useCallback((label: string, deadline?: Date | null) => {
+	const addTodo = useCallback((label: string, deadline?: Date | null, tags?: string[]) => {
 		setTodos((prev: Todo[]) => [
-			{ id: uuid(), label, checked: false, deadline },
+			{ id: uuid(), label, checked: false, deadline, tags: tags || [] },
 			...prev,
 		]);
 	}, []);
@@ -139,7 +162,8 @@ const App: React.FC = () => {
 		id: string,
 		checked: boolean,
 		label?: string,
-		deadline?: Date | null
+		deadline?: Date | null,
+		tags?: string[]
 	) => {
 		const updatedTodos = todos
 			.map((todo: Todo) =>
@@ -149,6 +173,7 @@ const App: React.FC = () => {
 							checked,
 							label: label || todo.label,
 							deadline: deadline || todo.deadline,
+							tags: tags || todo.tags,
 					  }
 					: todo
 			)
@@ -176,19 +201,12 @@ const App: React.FC = () => {
 		localStorage.setItem('todos', JSON.stringify(todos));
 	}, [todos]);
 
-	// useEffect(() => {
-	// 	const overdueTasks = todos.filter(
-	// 		(todo: Todo) => todo.deadline && new Date() > new Date(todo.deadline)
-	// 	);
-
-	// 	if (overdueTasks.length > 0) {
-	// 		alert(`You have ${overdueTasks.length} overdue tasks!`);
-	// 	}
-	// }, [todos]);
-
 	return (
-		<AppWrapper>
-			<Card>
+		<AppWrapper isDarkMode={isDarkMode}>
+			<ThemeToggle isDarkMode={isDarkMode} onClick={toggleTheme} aria-label="Toggle dark mode">
+				{isDarkMode ? '🌞' : '🌙'}
+			</ThemeToggle>
+			<Card isDarkMode={isDarkMode}>
 				<Title>Modern Todo List</Title>
 				<FilterWrapper>
 					<Dropdown
@@ -209,6 +227,14 @@ const App: React.FC = () => {
 				/>
 			</Card>
 		</AppWrapper>
+	);
+};
+
+const App: React.FC = () => {
+	return (
+		<ThemeProvider>
+			<AppContent />
+		</ThemeProvider>
 	);
 };
 
