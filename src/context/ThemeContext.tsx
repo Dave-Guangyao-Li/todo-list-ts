@@ -1,11 +1,31 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { createGlobalStyle } from 'styled-components';
+
+// Global style for smooth transitions
+const GlobalStyle = createGlobalStyle`
+  body {
+    transition: 
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  * {
+    transition: 
+      background-color 0.3s ease,
+      color 0.3s ease,
+      border-color 0.3s ease;
+  }
+`;
 
 interface ThemeContextType {
   isDarkMode: boolean;
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType>({
+  isDarkMode: false,
+  toggleTheme: () => {}
+});
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -15,15 +35,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    document.body.classList.toggle('dark-mode', isDarkMode);
     document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    setIsDarkMode(prev => !prev);
   };
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+      <GlobalStyle />
       {children}
     </ThemeContext.Provider>
   );
