@@ -21,6 +21,10 @@ const TodoItemUpdateButton = styled.button`
 	color: #fff;
 	border: none;
 	cursor: pointer;
+	&:focus {
+		outline: 2px solid #0056b3;
+		outline-offset: 2px;
+	}
 `;
 
 const TodoItemDeleteButton = styled.button`
@@ -30,6 +34,10 @@ const TodoItemDeleteButton = styled.button`
 	color: #fff;
 	border: none;
 	cursor: pointer;
+	&:focus {
+		outline: 2px solid #cc0000;
+		outline-offset: 2px;
+	}
 `;
 // const Label = styled.label<{ checked: boolean }>`
 // 	text-decoration: ${({ checked }) => (checked ? 'line-through' : 'none')};
@@ -93,6 +101,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
 				checked={checked}
 				onChange={(e) => onChange(id, e.target.checked)} // Pass updated checked state.// The checked value passed to onChange comes directly from the DOM event (e.target.checked), which ensures that the UI and the application state remain in sync.
 				aria-label={`Mark ${label} as ${checked ? 'incomplete' : 'complete'}`}
+				role="checkbox"
+				aria-checked={checked}
 			/>
 			{isEditing ? (
 				<input
@@ -105,6 +115,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
 					onChange={(e) => setEditLabel(e.target.value)}
 					onBlur={handleSave} // Save on blur
 					onKeyDown={(e) => e.key === 'Enter' && handleSave()} // Save on Enter
+					aria-label="Edit todo text"
 				/>
 			) : (
 				<span
@@ -115,7 +126,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
 						width: '100px',
 						overflow: 'hidden',
 						textOverflow: 'ellipsis',
-					}}
+						}}
+						aria-label={`Edit ${label} text`}
 				>
 					{label}
 				</span> // Enable editing on double-click
@@ -132,6 +144,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
 					onChange={(date) => setNewDeadline(date)}
 					placeholderText='Deadline'
 					onBlur={handleSave} // Save on blur
+					onKeyDown={(e) => e.key === 'Enter' && handleSave()} // Save on Enter
 				/>
 			) : deadline ? (
 				<span
@@ -154,6 +167,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
 						overflow: 'hidden',
 						textOverflow: 'ellipsis',
 					}}
+					aria-label='No deadline'
 				>
 					No deadline
 				</span>
@@ -163,8 +177,14 @@ const TodoItem: React.FC<TodoItemProps> = ({
 				className='todo-item-buttons'
 				style={{ display: 'flex', flexDirection: 'row' }}
 			>
-				<TodoItemUpdateButton onClick={handleEdit}>Edit</TodoItemUpdateButton>
-				<TodoItemDeleteButton onClick={handleDelete}>
+				<TodoItemUpdateButton
+					onClick={handleEdit}
+					aria-label={`Edit ${label}`}
+				>Edit</TodoItemUpdateButton>
+				<TodoItemDeleteButton
+					onClick={handleDelete}
+					aria-label={`Delete ${label}`}
+				>
 					Delete
 				</TodoItemDeleteButton>
 			</div>
