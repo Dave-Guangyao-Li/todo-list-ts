@@ -17,7 +17,8 @@ interface TodoListProps {
 		id: string,
 		checked: boolean,
 		label?: string,
-		deadline?: Date | null
+		deadline?: Date | null,
+		tags?: string[]
 	) => void;
 	onDelete: (id: string) => void;
 	setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
